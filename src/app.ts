@@ -2,15 +2,33 @@ import { Application, Request, Response } from 'express';
 import cors from 'cors';
 
 import express from 'express';
+import cookieParser from 'cookie-parser';
+import router from './app/routes';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
 const app: Application = express();
 
 //parser
 app.use(express.json());
-app.use(cors());
-app.get('/', (req: Request, res: Response) => {
-  const a = 1;
+app.use(cookieParser());
 
-  res.send(a);
+app.use(
+  cors({
+    origin: ['http://localhost:5173'],
+    credentials: true, // Allow credentials (cookies)
+  }),
+);
+
+
+
+// application routes
+app.use('/api/v1', router);
+app.get('/', (req: Request, res: Response) => {
+  res.send('This is Rokto Share Website .  !');
 });
+
+app.use(globalErrorHandler);
+
+//Not Found
+app.use(notFound);
 
 export default app;
