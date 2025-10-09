@@ -5,6 +5,8 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import router from './app/routes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
+
 const app: Application = express();
 
 //parser
@@ -26,9 +28,9 @@ app.get('/', (req: Request, res: Response) => {
   res.send('This is Rokto Share Website .  !');
 });
 
-app.use(globalErrorHandler);
-
 //Not Found
 app.use(notFound);
+app.use(globalErrorHandler);
+
 
 export default app;
