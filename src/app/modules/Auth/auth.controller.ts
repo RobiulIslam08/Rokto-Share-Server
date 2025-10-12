@@ -1,6 +1,7 @@
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
+import { AuthServices } from './auth.service';
 const registerDonor = catchAsync(async (req, res) => {
   const result = await AuthServices.registerDonorIntoDB(req.body);
   sendResponse(res, {

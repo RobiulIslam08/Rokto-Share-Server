@@ -5,6 +5,8 @@ import { User } from './auth.model';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
 import { createToken } from './auth.utils';
+import mongoose from 'mongoose';
+import { UserProfile } from '../User/user.modle';
 const loginUser = async (payload: Pick<TUser, 'email' | 'password'>) => {
   const user = await User.findOne({ email: payload?.email }).select(
     '+password',
@@ -28,4 +30,59 @@ const loginUser = async (payload: Pick<TUser, 'email' | 'password'>) => {
       accessToken,
       user: loggedInUser
     };
+};
+
+const registerDonorIntoDB =async (payload:Record<string,any>) => {
+ const userExists = await User.findOne({ email: payload.email });
+   if (userExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'This email is already used!');
+  }
+
+  const session = await mongoose.startSession();
+  try {
+	session.startTransaction();
+	const userData: Partial<TUser> = {
+      name: payload.name,
+      email: payload.email,
+      password: payload.password,
+      phone: payload.phone,
+      role: 'donor',
+    };
+	  const newUser = await User.create([userData], { session });
+	    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
+    }
+	 const userProfileData = {
+      user: newUser._id,
+      bloodGroup: payload.bloodGroup,
+      age: payload.age,
+      weight: payload.weight,
+      location: {
+        division: payload.division,
+        district: payload.district,
+        upazila: payload.upazila,
+      },
+      isAvailable: true,
+      lastDonationDate: payload.lastDonation,
+      medicalHistory: payload.medicalHistory,
+      previousDonations: payload.previousDonations | 0,
+    };
+	 await UserProfile.create( [userProfileData], { session });
+
+    await session.commitTransaction();
+    session.endSession();
+    
+    const result = await User.findById(newUser._id).lean();
+    return result;
+
+
+  } catch (err:any) {
+	await session.abortTransaction();
+    session.endSession();
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, `Failed to register donor: ${err.message}`);
+  }
+}
+export const AuthServices = {
+  loginUser,
+  registerDonorIntoDB,
 };
