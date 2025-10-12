@@ -11,9 +11,16 @@ const registerDonor = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const loginUser = ()=> {
-	
-}
+const loginUser = catchAsync(async (req, res) => {
+  const result = await AuthServices.loginUser(req.body);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User logged in successfully',
+    data: result,
+  });
+});
 
 export const AuthControllers = {
   registerDonor,
