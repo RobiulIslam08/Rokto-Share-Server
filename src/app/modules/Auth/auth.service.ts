@@ -69,7 +69,7 @@ const registerDonorIntoDB = async (payload: Record<string, any>) => {
     }
 
     const userProfileData = {
-      user: newUser[0]._id, // <-- পরিবর্তন করা হয়েছে
+      user: newUser[0]._id,
       bloodGroup: payload.bloodGroup,
       age: payload.age,
       weight: payload.weight,
@@ -81,7 +81,7 @@ const registerDonorIntoDB = async (payload: Record<string, any>) => {
       isAvailable: true,
       lastDonationDate: payload.lastDonation,
       medicalHistory: payload.medicalHistory,
-      previousDonations: payload.previousDonations ?? 0, // <-- (optional) একটু ক্লিনার পদ্ধতি
+      previousDonations: payload.previousDonations ?? 0,
     };
 
     await UserProfile.create([userProfileData], { session });
@@ -89,8 +89,25 @@ const registerDonorIntoDB = async (payload: Record<string, any>) => {
     await session.commitTransaction();
     session.endSession();
 
-    const result = await User.findById(newUser[0]._id).lean(); // <-- পরিবর্তন করা হয়েছে
-    return result;
+    const result = await User.findById(newUser[0]._id).lean();
+    
+    // ✅ Token তৈরি করুন (login এর মতো)
+    const jwtPayload = {
+      userId: newUser[0]._id.toString(),
+      role: 'donor',
+    };
+
+    const accessToken = createToken(
+      jwtPayload,
+      config.jwt_access_secret as string,
+      config.jwt_access_expires_in as string,
+    );
+
+    // ✅ User এবং Token দুটোই return করুন
+    return {
+      user: result,
+      token: accessToken,
+    };
 
   } catch (err: any) {
     await session.abortTransaction();

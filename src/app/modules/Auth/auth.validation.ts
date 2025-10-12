@@ -14,7 +14,7 @@ const registerDonorValidationSchema = z.object({
       email: z.string().email('Invalid email address'),
       phone: z.string().regex(/^01[3-9]\d{8}$/, 'Invalid phone number'),
       password: z.string().min(8, 'Password must be at least 8 characters'),
-      confirmPassword: z.string(),
+
       bloodGroup: z.enum(bloodGroups),
       age: z.coerce.number().min(18).max(65),
       weight: z.coerce.number().min(45),
@@ -25,10 +25,7 @@ const registerDonorValidationSchema = z.object({
       district: z.string(),
       upazila: z.string(),
     })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: 'Passwords do not match',
-	  path: ['confirmPassword'],
-    }),
+    
 });
 export const AuthValidations = {
   loginUserValidationSchema,
