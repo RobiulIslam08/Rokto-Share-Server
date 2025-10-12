@@ -16,17 +16,7 @@ const loginUser = async (payload: Pick<TUser, 'email' | 'password'>) => {
     user.password as string,
   );
   const jwtPayload = {
-    email: user?.email,
+    userId: user?._id,
     role: user?.role,
   };
-   if (!config.jwt_access_secret) {
-    throw new Error('JWT Access Secret is not defined in the configuration!');
-  }
-  const accessToken = jwt.sign(
-    jwtPayload,
-    config.jwt_access_secret, // এখানে 'as string' আর প্রয়োজন নেই
-    {
-      expiresIn: config.jwt_access_expires_in,
-    },
-  );
 };
