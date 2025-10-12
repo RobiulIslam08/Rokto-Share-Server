@@ -1,0 +1,10 @@
+import jwt, { JwtPayload } from 'jsonwebtoken';
+export const createToken = (
+  jwtPayload: { userId: string; role: string },
+  secret: jwt.Secret,
+  expiresIn: string | number,
+): string => {
+  return jwt.sign(jwtPayload, secret, {
+    expiresIn,
+  } as jwt.SignOptions); // Type assertion here
+};

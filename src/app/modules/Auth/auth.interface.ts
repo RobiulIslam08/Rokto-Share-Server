@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 export type TUserRole = 'user' | 'donor' | 'admin';
 
 export type TUser = {
@@ -7,4 +9,7 @@ export type TUser = {
   phone: string;
   role: TUserRole;
   passwordChangedAt?: Date;
+};
+export type TUserModel = Model<TUser> & {
+  isPasswordMatched(plainPassword: string, hashedPassword: string): Promise<boolean>;
 };
