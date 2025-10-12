@@ -30,3 +30,7 @@ const registerDonorValidationSchema = z.object({
 	  path: ['confirmPassword'],
     }),
 });
+export const AuthValidations = {
+  loginUserValidationSchema,
+  registerDonorValidationSchema,
+};
