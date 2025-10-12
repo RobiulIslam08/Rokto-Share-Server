@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import config from '../../config';
 import { createToken } from './auth.utils';
 import mongoose from 'mongoose';
-import { UserProfile } from '../User/user.modle';
+import { UserProfile } from '../User/user.model';
 const loginUser = async (payload: Pick<TUser, 'email' | 'password'>) => {
   const user = await User.findOne({ email: payload?.email }).select(
     '+password',
