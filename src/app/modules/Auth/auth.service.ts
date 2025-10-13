@@ -3,7 +3,7 @@ import AppError from '../../errors/AppError';
 import { TUser } from './auth.interface';
 import { User } from './auth.model';
 import config from '../../config';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 import mongoose from 'mongoose';
 import { UserProfile } from '../User/user.model';
 
@@ -30,16 +30,24 @@ const loginUser = async (payload: Pick<TUser, 'email' | 'password'>) => {
     role: user?.role,
   };
 
+  // ✅ Access Token এবং Refresh Token দুটোই তৈরি কর
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
     config.jwt_access_expires_in as string,
   );
 
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
+
   const loggedInUser = await User.findOne({ email: payload.email });
 
   return {
     accessToken,
+    refreshToken,
     user: loggedInUser,
   };
 };
@@ -97,16 +105,24 @@ const registerDonorIntoDB = async (payload: Record<string, any>) => {
       role: 'donor',
     };
 
+    // ✅ Access Token এবং Refresh Token দুটোই তৈরি করলাম
     const accessToken = createToken(
       jwtPayload,
       config.jwt_access_secret as string,
       config.jwt_access_expires_in as string,
     );
 
+    const refreshToken = createToken(
+      jwtPayload,
+      config.jwt_refresh_secret as string,
+      config.jwt_refresh_expires_in as string,
+    );
+
     // ✅ User এবং Token দুটোই return করুন
     return {
+      accessToken,
+      refreshToken,
       user: result,
-      token: accessToken,
     };
 
   } catch (err: any) {
@@ -119,7 +135,36 @@ const registerDonorIntoDB = async (payload: Record<string, any>) => {
   }
 };
 
+const refreshAccessToken = async (refreshToken: string) => {
+  // Verify refresh token
+  const decoded = verifyToken(refreshToken, config.jwt_refresh_secret as string);
+
+  const { userId } = decoded;
+
+  // Check if user exists
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Create new access token
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const newAccessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return {
+    accessToken: newAccessToken,
+  };
+};
 export const AuthServices = {
   loginUser,
   registerDonorIntoDB,
+  refreshAccessToken
 };

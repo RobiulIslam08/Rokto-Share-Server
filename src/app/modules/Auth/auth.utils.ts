@@ -10,6 +10,10 @@ export const createToken = (
 };
 
 export const verifyToken = (token: string, secret: string) => {
-  return jwt.verify(token, secret) as JwtPayload;
+ try {
+    return jwt.verify(token, secret) as JwtPayload;
+  } catch (error) {
+    throw new Error('Invalid or expired token');
+  }
 };
 
