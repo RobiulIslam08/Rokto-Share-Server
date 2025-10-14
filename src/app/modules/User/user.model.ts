@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TUserProfile } from './user.interface';
+import { IUserProfile } from './user.interface';
 
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const locationSchema = new Schema({
@@ -8,7 +8,7 @@ const locationSchema = new Schema({
   upazila: { type: String, required: true },
 }, {_id: false});
 
-const userProfileSchema = new Schema<TUserProfile>(
+const userProfileSchema = new Schema<IUserProfile>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
     bloodGroup: { type: String, enum: bloodGroups,required: true },
@@ -23,4 +23,4 @@ const userProfileSchema = new Schema<TUserProfile>(
   { timestamps: true },
 );
 
-export const UserProfile = model<TUserProfile>('UserProfile', userProfileSchema);
+export const UserProfile = model<IUserProfile>('UserProfile', userProfileSchema);
