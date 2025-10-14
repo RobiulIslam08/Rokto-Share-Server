@@ -51,7 +51,37 @@ const getAllDonorsFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+const getSingleDonorFromDB = async (id: string) => {
+  const donor = await UserProfile.findById(id).populate({
+    path: 'user',
+    select: 'name email phone avatar createdAt',
+  });
 
+  if (!donor) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Donor not found!');
+  }
+
+  // Transform data
+  const transformedData = {
+    id: donor._id,
+    name: (donor.user as any)?.name,
+    email: (donor.user as any)?.email,
+    phone: (donor.user as any)?.phone,
+    avatar: (donor.user as any)?.avatar || '/placeholder.svg?height=40&width=40',
+    bloodGroup: donor.bloodGroup,
+    location: donor.location,
+    age: donor.age,
+    weight: donor.weight,
+    isAvailable: donor.isAvailable,
+    lastDonation: donor.lastDonationDate,
+    rating: donor.rating || 4.5,
+    totalDonations: donor.previousDonations || 0,
+    verified: donor.verified || true,
+    medicalHistory: donor.medicalHistory,
+  };
+
+  return transformedData;
+};
 
 export const DonorServices = {
   getAllDonorsFromDB,
