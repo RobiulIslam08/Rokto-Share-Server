@@ -9,7 +9,7 @@ const handleValidationError = (err:mongoose.Error.ValidationError):TGenericError
 		message:val?.message
 	}
  })
-const statusCode = 40;
+const statusCode = 400;
 
  return {
 	statusCode,

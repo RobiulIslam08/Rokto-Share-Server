@@ -68,3 +68,57 @@
 // };
 
 // export default auth;
+
+
+// src/app/middlewares/auth.ts
+// src/app/middlewares/auth.ts
+import { NextFunction, Request, Response } from 'express';
+import catchAsync from '../utils/catchAsync';
+import AppError from '../errors/AppError';
+import httpStatus from 'http-status';
+import { verifyToken } from '../modules/Auth/auth.utils';
+import config from '../config';
+import { JwtPayload } from 'jsonwebtoken';
+
+// Request type extend করুন
+
+
+const auth = (...requiredRoles: string[]) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // Authorization header থেকে token নিন
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+    }
+
+    // Token verify করুন
+    let decoded;
+    try {
+      decoded = verifyToken(token, config.jwt_access_secret as string);
+    } catch (error) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token');
+    }
+
+    // req.user তে decoded data set করুন
+    req.user = decoded as JwtPayload & { userId: string; role: string };
+
+    // Role check করুন
+    if (requiredRoles.length && !requiredRoles.includes(decoded.role)) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        'You do not have permission to access this resource'
+      );
+    }
+
+    next();
+  });
+};
+
+export default auth;
