@@ -15,7 +15,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://roktoshare.netlify.app'],
+    origin: ['http://localhost:5173'],
     credentials: true, // Allow credentials (cookies)
   }),
 );

@@ -12,4 +12,13 @@ router.put(
   validateRequest(UserValidations.updateProfileValidationSchema), // Zod validation
   UserControllers.updateUserProfile,
 );
+
+
+
+
+
+
+
+
+
 export const UserRoutes = router;

@@ -17,19 +17,20 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
 
 });
 // ✅ NEW: Controller for updating the profile
-const updateUserProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
-  const payload = req.body;
+// const updateUserProfile = catchAsync(async (req: Request, res: Response) => {
+//   const userId = req.user?.userId;
+//   const payload = req.body;
 
-  const result = await UserServices.updateUserProfileIntoDB(userId as string, payload);
+//   const result = await UserServices.updateUserProfileIntoDB(userId as string, payload);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'User profile updated successfully',
-    data: result,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'User profile updated successfully',
+//     data: result,
+//   });
+// });
+
 export const UserControllers = {
   getUserProfile,
   updateUserProfile
