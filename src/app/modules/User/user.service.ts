@@ -15,20 +15,9 @@ const getUserProfileDataFromDB = async (userId: string) => {
 
   return userProfile;
 };
-const updateUserProfileIntoDB = async (
-  userId: string,
-  payload: Record<string, any>,
-) => {
-  const {
-    name,
-    phone,
-    age,
-    weight,
-    location,
-    isAvailable,
-    lastDonationDate,
-    medicalHistory,
-  } = payload;
+const updateUserProfileIntoDB = async (userId: string,payload: Record<string, any>) => {
+  
+  const {name,phone,age,weight,location,isAvailable,lastDonationDate,medicalHistory} = payload;
 
   const session = await mongoose.startSession();
 
